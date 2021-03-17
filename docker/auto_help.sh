@@ -19,13 +19,13 @@ fi
 # 收集助力码
 collectSharecode(){
     if [ -f ${2} ]; then
-        echo "${1}：清理旧助力码，收集新助力码"
+        echo "${1}：清理 ${logFile} 中的旧助力码，收集新助力码"
         #删除旧助力码
         sed -i '/'"${1}"'/d' ${logFile}
     
         sed -n '/'${1}'.*/'p ${2} |  sed 's/京东账号/京东账号 /g' | sed 's/（/ （/g' | sed 's/】/】 /g' | awk '{print $4,$5,$6,$7}' | sort -gk2  | awk '!a[$2" "$3]++{print}' >>$logFile
     else
-        echo "${1}：${2} 文件不存在,不清理旧助力码"
+        echo "${1}：${2} 文件不存在,不清理 ${logFile} 中的旧助力码"
     fi
     
     
@@ -36,7 +36,9 @@ collectSharecode(){
 exportSharecode(){
     if [ -f ${logFile} ]; then
         #账号数
-        cookiecount=$(echo ${JD_COOKIE} | awk -F '&' '{print NF}')
+        cookiecount=$(echo ${JD_COOKIE} | grep -o pt_key |  grep -c pt_key)
+        echo "cookie个数：${cookiecount}"
+
         # 单个账号助力码
         singleSharecode=$(sed -n '/'${1}'.*/'p ${logFile} | awk '{print $4}' | awk '{T=T"@"$1} END {print T}' |  awk '{print substr($1,2)}')
 #        | awk '{print $2,$4}' | sort -g | uniq
@@ -100,7 +102,8 @@ autoHelp(){
 
 ############# 短期活动 #############
 
-
+#环球挑战赛
+autoHelp "环球挑战赛好友互助码" "${logDir}/jd_global.log" "JDGLOBAL_SHARECODES"
 
 
 
